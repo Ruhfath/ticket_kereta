@@ -23,8 +23,12 @@ export default function Loginpage() {
         password,
       });
 
-      // Redirect to dashboard on successful login
-      router.push("/customer/dashboard");
+      // Redirect based on user role
+      if (response.user?.role === "ADMIN") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/customer/dashboard");
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Login failed. Please try again.";
       setError(errorMessage);
@@ -158,7 +162,7 @@ export default function Loginpage() {
           <div className="mt-8 text-center">
             <p className="text-gray-600">
               Belum punya akun?{" "}
-              <a href="/signup" className="text-blue-600 font-bold hover:text-blue-700 transition">
+              <a href="/register" className="text-blue-600 font-bold hover:text-blue-700 transition">
                 Daftar sekarang
               </a>
             </p>

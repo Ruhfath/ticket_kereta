@@ -3,49 +3,60 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HomeIcon, TicketIcon, QuestionMarkCircleIcon, UserIcon } from '@heroicons/react/24/outline';
+import { useEffect, useState } from 'react';
+import { authService } from '@/service/authService';
+import { HomeIcon, TicketIcon, UserIcon } from '@heroicons/react/24/outline';
 import { HomeIcon as HomeIconSolid, TicketIcon as TicketIconSolid, UserIcon as UserIconSolid } from '@heroicons/react/24/solid';
-
-const navItems = [
-  {
-    name: 'Dashboard',
-    href: '/',
-    icon: HomeIcon,
-    activeIcon: HomeIconSolid,
-  },
-  {
-    name: 'Cari Tiket',
-    href: '/cari-tiket',
-    icon: TicketIcon,
-    activeIcon: TicketIconSolid,
-  },
-  {
-    name: 'Ticket Saya',
-    href: '/ticket-saya',
-    icon: TicketIcon,
-    activeIcon: TicketIconSolid,
-  },
-  {
-    name: 'Login',
-    href: '/login',
-    icon: UserIcon,
-    activeIcon: UserIconSolid,
-  },
-];
 
 export default function BottomNavbar() {
   const pathname = usePathname();
+  const [isAuth, setIsAuth] = useState(false);
 
-  // Hide navbar on login page
-  if (pathname.startsWith('/login')) {
+  useEffect(() => {
+    setIsAuth(authService.isAuthenticated());
+  }, [pathname]);
+
+  // Hide navbar on login, register, and admin pages
+  if (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/admin')) {
     return null;
   }
+
+  const navItems = [
+    {
+      name: isAuth ? 'Dashboard' : 'Beranda',
+      href: isAuth ? '/customer/dashboard' : '/',
+      icon: HomeIcon,
+      activeIcon: HomeIconSolid,
+    },
+    {
+      name: 'Cari Tiket',
+      href: isAuth ? '/customer/cari-ticket' : '/',
+      icon: TicketIcon,
+      activeIcon: TicketIconSolid,
+    },
+    {
+      name: 'Ticket Saya',
+      href: isAuth ? '/customer/ticket-saya' : '/login',
+      icon: TicketIcon,
+      activeIcon: TicketIconSolid,
+    },
+    {
+      name: isAuth ? 'Profil' : 'Login',
+      href: isAuth ? '/customer/dashboard' : '/login',
+      icon: UserIcon,
+      activeIcon: UserIconSolid,
+    },
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg rounded-t-2xl z-50">
       <div className="flex justify-around items-center h-16 px-4">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          // A tab is active if the current pathname is exactly item.href or is a child of item.href (for subroutes like /customer/dashboard)
+          const isActive = item.href === '/' 
+            ? pathname === '/' 
+            : pathname.startsWith(item.href);
+          
           const Icon = isActive ? item.activeIcon : item.icon;
 
           return (
