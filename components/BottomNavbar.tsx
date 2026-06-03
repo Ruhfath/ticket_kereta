@@ -10,11 +10,7 @@ import { HomeIcon as HomeIconSolid, TicketIcon as TicketIconSolid, UserIcon as U
 
 export default function BottomNavbar() {
   const pathname = usePathname();
-  const [isAuth, setIsAuth] = useState(false);
-
-  useEffect(() => {
-    setIsAuth(authService.isAuthenticated());
-  }, [pathname]);
+  const [isAuth] = useState(() => authService.isAuthenticated());
 
   // Hide navbar on login, register, and admin pages
   if (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/admin')) {
